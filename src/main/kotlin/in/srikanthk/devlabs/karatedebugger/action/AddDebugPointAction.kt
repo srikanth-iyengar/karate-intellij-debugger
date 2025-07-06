@@ -1,9 +1,11 @@
 package `in`.srikanthk.devlabs.karatedebugger.action
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.platform.ide.progress.ModalTaskOwner.project
 import `in`.srikanthk.devlabs.karatedebugger.service.KarateExecutionService
 
 
@@ -28,5 +30,6 @@ open class AddDebugPointAction : AnAction() {
         val lineNumber = editor.caretModel.logicalPosition.line + 1
 
         karateExecutionService?.addBreakpoint(virtualFile?.path!!, lineNumber);
+        DaemonCodeAnalyzer.getInstance(action.project).restart(psiFile)
     }
 }

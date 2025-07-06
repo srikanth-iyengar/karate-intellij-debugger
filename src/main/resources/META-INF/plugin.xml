@@ -15,6 +15,16 @@
         <toolWindow factoryClass="in.srikanthk.devlabs.karatedebugger.ui.DebugToolWindowFactory"
                     id="Karate Chop Debugger" secondary="true" anchor="left"
                     icon="AllIcons.Toolwindows.ToolWindowInspection"/>
+        <applicationService
+                serviceImplementation="in.srikanthk.devlabs.karatedebugger.configuration.KarateDebuggerConfiguration"/>
+        <applicationConfigurable
+                parentId="tools"
+                instance="in.srikanthk.devlabs.karatedebugger.ui.AppSettingsConfigurable"
+                id="org.intellij.sdk.settings.AppSettingsConfigurable"
+                displayName="Karate Debugger Preference"/>
+            <notificationGroup id="Karate Debugger Notification"
+                               displayType="BALLOON"
+                               isLogByDefault="true"/>
     </extensions>
     <projectListeners>
         <listener class="in.srikanthk.devlabs.karatedebugger.listener.KarateBreakpointListener"

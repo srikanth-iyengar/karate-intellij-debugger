@@ -1,5 +1,6 @@
 package `in`.srikanthk.devlabs.karatedebugger.action
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -24,5 +25,6 @@ open class RemoveDebugPointAction : AnAction() {
         val lineNumber = editor.caretModel.logicalPosition.line + 1
 
         karateExecutionService?.removeBreakpoint(virtualFile?.path!!, lineNumber);
+        DaemonCodeAnalyzer.getInstance(action.project).restart(psiFile)
     }
 }
