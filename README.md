@@ -42,10 +42,10 @@ https://github.com/user-attachments/assets/3b4685f4-3734-40c6-ba37-32073f9e84c5
 ### Installation
 
 1. Go to **Settings > Plugins > Marketplace** in IntelliJ.
-2. Search for **Karate IntelliJ Debugger**.
+2. Search for **Karate Chop Debugger**.
 3. Click **Install** and restart IntelliJ.
 
-_Or manually install from [Releases](https://github.com/srikanth-iyengar/karate-intellij-debugger/releases)._
+_Or manually install from [Releases](https://github.com/srikanth-iyengar/karate-chop-debugger/releases)._
 
 ---
 
@@ -63,8 +63,8 @@ _Or manually install from [Releases](https://github.com/srikanth-iyengar/karate-
 Clone the repo and run the plugin in IntelliJ:
 
 ```bash
-git clone https://github.com/srikanth-iyengar/karate-intellij-debugger.git
-cd karate-intellij-debugger
+git clone https://github.com/srikanth-iyengar/karate-chop-debugger.git
+cd karate-chop-debugger
 ./gradlew runIde
 ```
 
@@ -85,7 +85,7 @@ Contributions, issues, and feature requests are welcome!
 ## 📣 Feedback & Support
 
 Have suggestions or bugs? Feel free
-to [open an issue](https://github.com/srikanth-iyengar/karate-intellij-debugger/issues) or drop a star ⭐️ if this plugin
+to [open an issue](https://github.com/srikanth-iyengar/karate-chop-debugger/issues) or drop a star ⭐️ if this plugin
 made your life easier.
 
 ---
