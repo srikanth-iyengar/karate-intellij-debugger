@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.language
+package `in`.srikanthk.devlabs.kchopdebugger.language
 
 import com.intellij.lang.Language
 

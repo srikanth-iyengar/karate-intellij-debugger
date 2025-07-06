@@ -1,12 +1,12 @@
-package `in`.srikanthk.devlabs.karatedebugger.ui
+package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.table.JBTable
 import com.intuit.karate.core.Variable
-import `in`.srikanthk.devlabs.karatedebugger.service.DebuggerState
-import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoResponseTopic
+import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
+import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.table.DefaultTableModel

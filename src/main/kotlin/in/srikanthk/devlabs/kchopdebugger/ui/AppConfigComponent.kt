@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.ui
+package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField

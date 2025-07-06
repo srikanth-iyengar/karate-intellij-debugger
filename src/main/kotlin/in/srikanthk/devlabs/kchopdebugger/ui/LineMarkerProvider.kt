@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.ui
+package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
-import `in`.srikanthk.devlabs.karatedebugger.service.KarateExecutionService
+import `in`.srikanthk.devlabs.kchopdebugger.service.KarateExecutionService
 
 
 class KarateLineMarkerProvider : LineMarkerProvider {

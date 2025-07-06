@@ -1,9 +1,9 @@
-package `in`.srikanthk.devlabs.karatedebugger.action
+package `in`.srikanthk.devlabs.kchopdebugger.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import `in`.srikanthk.devlabs.karatedebugger.service.KarateExecutionService
+import `in`.srikanthk.devlabs.kchopdebugger.service.KarateExecutionService
 import java.util.concurrent.CompletableFuture
 
 open class RunTestAction : AnAction() {

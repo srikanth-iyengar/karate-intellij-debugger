@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.service
+package `in`.srikanthk.devlabs.kchopdebugger.service
 
 interface Constants {
     companion object {

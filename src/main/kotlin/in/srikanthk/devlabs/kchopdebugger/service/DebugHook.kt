@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.service
+package `in`.srikanthk.devlabs.kchopdebugger.service
 
 import com.intellij.openapi.project.Project
 import com.intuit.karate.RuntimeHook
@@ -6,8 +6,8 @@ import com.intuit.karate.Suite
 import com.intuit.karate.core.ScenarioRuntime
 import com.intuit.karate.core.Step
 import com.intuit.karate.core.StepResult
-import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoRequestTopic
-import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoResponseTopic
+import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoRequestTopic
+import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.CountDownLatch
