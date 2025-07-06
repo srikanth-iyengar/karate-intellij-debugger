@@ -4,22 +4,17 @@ A powerful and intuitive IntelliJ plugin to **debug your Karate test cases** lik
 console logs—step through your scenarios, inspect variables, and navigate through test files visually.
 
 ---
-
-![Plugin Logo](./docs/logo.svg) <!-- Add your logo here -->
+<p align='center'>
+    <img width="45%" src="./docs/logo.svg">
+</p>
 
 ## 🎬 Demo
 
 Watch the plugin in action:
 
-> 📽 A quick demo of the plugin in action is available in the [
-`./docs/karate-debugger-demo.mp4`](./docs/karate-debugger-demo.mp4) file.
-<html>
-<video width="640" height="480" controls>
-      <source src="YOUR_VIDEO_RAW_URL.mp4" type="video/mp4">
-      Your browser does not support the video tag.
 
-</video>
-</html>
+https://github.com/user-attachments/assets/3b4685f4-3734-40c6-ba37-32073f9e84c5
+
 
 ---
 
