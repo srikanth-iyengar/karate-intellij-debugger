@@ -5,7 +5,25 @@
 
     <vendor url="https://devlab.srikanthk.in">DevLabs</vendor>
 
-    <description><![CDATA[This is ]]></description>
+    <description><![CDATA[
+  🥋 <b>Karate Chop Debugger</b> is an unofficial IntelliJ plugin that makes debugging Karate test cases a whole lot easier.
+
+  Set breakpoints directly in your <code>.feature</code> files, run tests in debug mode, and inspect variables on the fly — all from the comfort of your IDE. No more scanning logs line by line to figure out what went wrong.
+
+  With this plugin, you can:
+  • Add breakpoints with a simple right-click
+  • View live variables and responses when a breakpoint is hit
+  • Jump straight to the lines being executed
+  • Seamlessly work with your existing Karate projects
+
+  <br/><br/>
+  ⚠️ Note: To see breakpoints in the gutter, make sure the <i>Cucumber for Java</i> plugin is installed.
+
+  <br/><br/>
+  This is an <b>unofficial community plugin</b> and is not affiliated with the Karate project or its maintainers.
+
+  <br/><br/>
+  Whether you're debugging a flaky test or just want more visibility — this plugin is here to help you work smarter.]]></description>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.xdebugger</depends>

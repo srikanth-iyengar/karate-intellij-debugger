@@ -1,20 +1,19 @@
 # 🥋 Karate Chop Debugger
 
-A powerful and intuitive IntelliJ plugin to **debug your Karate test cases** like never before. Say goodbye to cryptic
-console logs—step through your scenarios, inspect variables, and navigate through test files visually.
+**An unofficial IntelliJ plugin** to **debug your Karate test cases** like never before. Say goodbye to cryptic console logs—step through your scenarios, inspect variables, and navigate through test files visually.
+
+> 📝 _This is an unofficial, community-developed plugin._
 
 ---
 <p align='center'>
-    <img width="45%" src="./docs/logo.svg">
+    <img width="45%" src="./docs/logo.png">
 </p>
 
 ## 🎬 Demo
 
 Watch the plugin in action:
 
-
 https://github.com/user-attachments/assets/3b4685f4-3734-40c6-ba37-32073f9e84c5
-
 
 ---
 
@@ -32,7 +31,7 @@ https://github.com/user-attachments/assets/3b4685f4-3734-40c6-ba37-32073f9e84c5
 
 ### Gotcha
 
-- For now the breakpoints you add will only be visible in the gutter only if you have cucumber for java plugin installed
+- 🔸 Breakpoints will only be visible in the gutter if the **Cucumber for Java** plugin is installed.
 
 ### Prerequisites
 
@@ -84,17 +83,16 @@ Contributions, issues, and feature requests are welcome!
 
 ## 📣 Feedback & Support
 
-Have suggestions or bugs? Feel free
-to [open an issue](https://github.com/srikanth-iyengar/karate-chop-debugger/issues) or drop a star ⭐️ if this plugin
-made your life easier.
+Have suggestions or bugs? Feel free to [open an issue](https://github.com/srikanth-iyengar/karate-chop-debugger/issues) or drop a ⭐ if this plugin made your life easier.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GPL v3](LICENSE).
+
+> 🚨 This is an unofficial plugin and is not associated with any official testing framework or organization.
 
 ---
 
 **Debug smarter. Karate harder. 💥**
-
