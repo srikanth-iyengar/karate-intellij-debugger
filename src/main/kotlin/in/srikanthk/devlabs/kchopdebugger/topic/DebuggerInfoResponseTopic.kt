@@ -1,12 +1,12 @@
-package `in`.srikanthk.devlabs.karatedebugger.topic
+package `in`.srikanthk.devlabs.kchopdebugger.topic
 
 import com.intellij.util.messages.Topic
 import com.intuit.karate.core.Variable
-import `in`.srikanthk.devlabs.karatedebugger.service.DebuggerState
+import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
 
 interface DebuggerInfoResponseTopic {
     companion object {
-        val TOPIC = Topic.create("Karate Debugger Response Topic", DebuggerInfoResponseTopic::class.java)
+        val TOPIC = Topic.create("Karate Chop Debugger Response Topic", DebuggerInfoResponseTopic::class.java)
     }
 
     fun updateKarateVariables(vars: Map<String, Variable>)

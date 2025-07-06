@@ -1,10 +1,10 @@
-package `in`.srikanthk.devlabs.karatedebugger.topic
+package `in`.srikanthk.devlabs.kchopdebugger.topic
 
 import com.intellij.util.messages.Topic
 
 interface DebuggerInfoRequestTopic {
     companion object {
-        val TOPIC = Topic.create("Karate Debugger Topic", DebuggerInfoRequestTopic::class.java)
+        val TOPIC = Topic.create("Karate Chop Debugger Topic", DebuggerInfoRequestTopic::class.java)
     }
 
     fun publishKarateVariables()

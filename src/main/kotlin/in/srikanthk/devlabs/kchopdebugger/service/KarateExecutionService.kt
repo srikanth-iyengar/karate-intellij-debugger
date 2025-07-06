@@ -1,21 +1,16 @@
-package `in`.srikanthk.devlabs.karatedebugger.service
+package `in`.srikanthk.devlabs.kchopdebugger.service
 
-import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intuit.karate.Runner
-import `in`.srikanthk.devlabs.karatedebugger.configuration.KarateDebuggerConfiguration
-import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoResponseTopic
-import io.ktor.util.collections.*
+import `in`.srikanthk.devlabs.kchopdebugger.configuration.KarateDebuggerConfiguration
+import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
+import io.ktor.util.collections.ConcurrentMap
 import java.io.File
 import java.net.URLClassLoader
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentSkipListSet
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import javax.xml.parsers.DocumentBuilderFactory
 
 
@@ -24,7 +19,7 @@ class KarateExecutionService(val project: Project) {
 
     private val responsePublisher = project.messageBus.syncPublisher(DebuggerInfoResponseTopic.TOPIC)
     val notificationGroup = NotificationGroupManager.getInstance()
-        .getNotificationGroup("Karate Debugger Notification")
+        .getNotificationGroup("Karate Chop Debugger Notification")
 
     companion object {
         // key of filename and breakpoint line

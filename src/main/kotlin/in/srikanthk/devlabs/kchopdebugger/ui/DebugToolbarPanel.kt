@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.ui
+package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionManager
@@ -16,10 +16,10 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.components.JBTextField
 import com.intellij.xdebugger.ui.DebuggerColors
 import com.intuit.karate.core.Variable
-import `in`.srikanthk.devlabs.karatedebugger.service.DebuggerState
-import `in`.srikanthk.devlabs.karatedebugger.service.KarateExecutionService
-import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoRequestTopic
-import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoResponseTopic
+import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
+import `in`.srikanthk.devlabs.kchopdebugger.service.KarateExecutionService
+import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoRequestTopic
+import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import javax.swing.JPanel

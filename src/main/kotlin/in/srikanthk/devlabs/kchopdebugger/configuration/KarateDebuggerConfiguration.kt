@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.configuration
+package `in`.srikanthk.devlabs.kchopdebugger.configuration
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent

@@ -1,9 +1,9 @@
-package `in`.srikanthk.devlabs.karatedebugger.ui
+package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.util.NlsContexts
-import `in`.srikanthk.devlabs.karatedebugger.configuration.KarateDebuggerConfiguration
-import `in`.srikanthk.devlabs.karatedebugger.configuration.MavenState
+import `in`.srikanthk.devlabs.kchopdebugger.configuration.KarateDebuggerConfiguration
+import `in`.srikanthk.devlabs.kchopdebugger.configuration.MavenState
 import org.jetbrains.annotations.Nullable
 import java.util.*
 import javax.swing.JComponent
@@ -45,6 +45,6 @@ internal class AppSettingsConfigurable : Configurable {
     }
 
     override fun getDisplayName(): @NlsContexts.ConfigurableName String? {
-        return "Karate Debugger Preference"
+        return "Karate Chop Debugger Preference"
     }
 }

@@ -11,37 +11,37 @@
     <depends>com.intellij.modules.xdebugger</depends>
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language=""
-                                        implementationClass="in.srikanthk.devlabs.karatedebugger.ui.KarateLineMarkerProvider"/>
-        <toolWindow factoryClass="in.srikanthk.devlabs.karatedebugger.ui.DebugToolWindowFactory"
+                                        implementationClass="in.srikanthk.devlabs.kchopdebugger.ui.KarateLineMarkerProvider"/>
+        <toolWindow factoryClass="in.srikanthk.devlabs.kchopdebugger.ui.DebugToolWindowFactory"
                     id="Karate Chop Debugger" secondary="true" anchor="left"
                     icon="AllIcons.Toolwindows.ToolWindowInspection"/>
         <applicationService
-                serviceImplementation="in.srikanthk.devlabs.karatedebugger.configuration.KarateDebuggerConfiguration"/>
+                serviceImplementation="in.srikanthk.devlabs.kchopdebugger.configuration.KarateDebuggerConfiguration"/>
         <applicationConfigurable
                 parentId="tools"
-                instance="in.srikanthk.devlabs.karatedebugger.ui.AppSettingsConfigurable"
+                instance="in.srikanthk.devlabs.kchopdebugger.ui.AppSettingsConfigurable"
                 id="org.intellij.sdk.settings.AppSettingsConfigurable"
-                displayName="Karate Debugger Preference"/>
-            <notificationGroup id="Karate Debugger Notification"
+                displayName="Karate Chop Debugger Preference"/>
+            <notificationGroup id="Karate Chop Debugger Notification"
                                displayType="BALLOON"
                                isLogByDefault="true"/>
     </extensions>
     <projectListeners>
-        <listener class="in.srikanthk.devlabs.karatedebugger.listener.KarateBreakpointListener"
+        <listener class="in.srikanthk.devlabs.kchopdebugger.listener.KarateBreakpointListener"
                   topic="com.intellij.xdebugger.breakpoints.XBreakpointListener"/>
     </projectListeners>
 
     <actions>
-        <action id="in.srikanthk.devlabs.karatedebugger.action.RunTestAction"
-                class="in.srikanthk.devlabs.karatedebugger.action.RunTestAction" text="Debug Test">
+        <action id="in.srikanthk.devlabs.kchopdebugger.action.RunTestAction"
+                class="in.srikanthk.devlabs.kchopdebugger.action.RunTestAction" text="Debug Test">
             <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="GotoAction"/>
         </action>
-        <action id="in.srikanthk.devlabs.karatedebugger.action.AddDebugPointAction"
-                class="in.srikanthk.devlabs.karatedebugger.action.AddDebugPointAction" text="Add Breakpoint">
+        <action id="in.srikanthk.devlabs.kchopdebugger.action.AddDebugPointAction"
+                class="in.srikanthk.devlabs.kchopdebugger.action.AddDebugPointAction" text="Add Breakpoint">
             <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="GotoAction"/>
         </action>
-        <action id="in.srikanthk.devlabs.karatedebugger.action.RemoveDebugPointAction"
-                class="in.srikanthk.devlabs.karatedebugger.action.RemoveDebugPointAction" text="Remove Breakpoint">
+        <action id="in.srikanthk.devlabs.kchopdebugger.action.RemoveDebugPointAction"
+                class="in.srikanthk.devlabs.kchopdebugger.action.RemoveDebugPointAction" text="Remove Breakpoint">
             <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="GotoAction"/>
         </action>
     </actions>

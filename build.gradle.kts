@@ -30,9 +30,6 @@ dependencies {
         // bundledPlugin("com.intellij.java")
     }
 
-    // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
-    implementation("io.projectreactor:reactor-core:3.7.7")
-    // https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
     implementation("com.intuit.karate:karate-junit5:1.4.1")
 }
 

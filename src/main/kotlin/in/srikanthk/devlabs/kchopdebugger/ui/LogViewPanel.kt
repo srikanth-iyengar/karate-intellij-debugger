@@ -1,10 +1,10 @@
-package `in`.srikanthk.devlabs.karatedebugger.ui
+package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.project.Project
 import com.intuit.karate.core.Variable
-import `in`.srikanthk.devlabs.karatedebugger.service.DebuggerState
-import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoResponseTopic
+import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
+import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
 import javax.swing.JPanel
 

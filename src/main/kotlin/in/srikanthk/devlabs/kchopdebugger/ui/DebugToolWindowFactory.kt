@@ -1,4 +1,4 @@
-package `in`.srikanthk.devlabs.karatedebugger.ui
+package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow

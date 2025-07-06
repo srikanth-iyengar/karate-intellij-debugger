@@ -1,4 +1,4 @@
-# 🥋 Karate IntelliJ Debugger
+# 🥋 Karate Chop Debugger
 
 A powerful and intuitive IntelliJ plugin to **debug your Karate test cases** like never before. Say goodbye to cryptic
 console logs—step through your scenarios, inspect variables, and navigate through test files visually.
