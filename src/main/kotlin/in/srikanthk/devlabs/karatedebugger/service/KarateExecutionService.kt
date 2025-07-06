@@ -44,6 +44,8 @@ class KarateExecutionService(val project: Project) {
                 .classLoader(classLoader)
             builder.parallel(1)
         }, executor)
+
+        future.get()
     }
 
     fun addBreakpoint(file: String, lineNumber: Int) {

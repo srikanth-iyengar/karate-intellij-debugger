@@ -17,6 +17,7 @@ class DebugHook(private val breakpoints: MutableMap<String, ConcurrentSkipListSe
 
     val publisher: DebuggerInfoResponseTopic? = project.messageBus.syncPublisher(DebuggerInfoResponseTopic.TOPIC);
 
+    @Volatile
     private var stopOnNextStep = false;
     override fun beforeSuite(suite: Suite?) {
         val publisher = project.messageBus.syncPublisher(DebuggerInfoResponseTopic.TOPIC);
