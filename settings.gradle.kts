@@ -1,1 +1,1 @@
-rootProject.name = "karate-debugger"
+rootProject.name = "karate-chop-debugger"

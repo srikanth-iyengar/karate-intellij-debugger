@@ -1,7 +1,7 @@
 <idea-plugin>
-    <id>in.srikanthk.devlabs.karate-debugger</id>
+    <id>in.srikanthk.devlabs.karate-chop-debugger</id>
 
-    <name>Karate-Debugger</name>
+    <name>Karate Chop Debugger</name>
 
     <vendor url="https://devlab.srikanthk.in">DevLabs</vendor>
 

@@ -8,6 +8,7 @@ import com.intuit.karate.Runner
 import `in`.srikanthk.devlabs.kchopdebugger.configuration.KarateDebuggerConfiguration
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import io.ktor.util.collections.ConcurrentMap
+import kotlinx.io.IOException
 import java.io.File
 import java.net.URLClassLoader
 import java.util.concurrent.*
@@ -63,32 +64,37 @@ class KarateExecutionService(val project: Project) {
         val mavenState = KarateDebuggerConfiguration.getInstance()?.state;
 
         if (mavenState?.mavenPath == null || mavenState.mavenPath.isBlank()) {
-            notificationGroup.createNotification("Maven home is not set", NotificationType.ERROR).notify(project)
+            notificationGroup.createNotification("Karate chop error", "Maven home is not set",NotificationType.ERROR).notify(project)
             return false
         }
 
         val command = "${mavenState?.mavenPath}/bin/${Constants.MAVEN_BUILDER_COMMAND}";
-        val process =
-            ProcessBuilder(*command.split(" ").toTypedArray()).directory(File(projectPath))
-                .redirectOutput(ProcessBuilder.Redirect.PIPE).redirectError(ProcessBuilder.Redirect.PIPE).start()
+        try {
+            val process =
+                ProcessBuilder(*command.split(" ").toTypedArray()).directory(File(projectPath))
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE).redirectError(ProcessBuilder.Redirect.PIPE).start()
 
-        Thread {
-            process.errorStream.bufferedReader().use { reader ->
-                reader.lineSequence().forEach { line ->
-                    responsePublisher.appendLog(line, true)
+            Thread {
+                process.errorStream.bufferedReader().use { reader ->
+                    reader.lineSequence().forEach { line ->
+                        responsePublisher.appendLog(line, true)
+                    }
                 }
-            }
-        }.start()
+            }.start()
 
-        Thread {
-            process.inputStream.bufferedReader().use { reader ->
-                reader.lineSequence().forEach { line ->
-                    responsePublisher.appendLog(line, false)
+            Thread {
+                process.inputStream.bufferedReader().use { reader ->
+                    reader.lineSequence().forEach { line ->
+                        responsePublisher.appendLog(line, false)
+                    }
                 }
-            }
-        }.start()
+            }.start()
 
-        return process.waitFor() == 0
+            return process.waitFor() == 0
+        } catch (e: IOException) {
+            notificationGroup.createNotification("Karate Chop error", "Failed to run test ${e.message}",NotificationType.ERROR).notify(project)
+            return false
+        }
     }
 
     private fun getThreadPool(classloader: ClassLoader): ThreadPoolExecutor = ThreadPoolExecutor(
