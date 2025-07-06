@@ -26,7 +26,7 @@ import javax.swing.JPanel
 
 class DebugToolbarPanel(val project: Project) : JPanel(BorderLayout()) {
 
-    val publisher = project.messageBus.syncPublisher(DebuggerInfoRequestTopic.TOPIC)
+    val publisher: DebuggerInfoRequestTopic? = project.messageBus.syncPublisher(DebuggerInfoRequestTopic.TOPIC)
     var state = DebuggerState.Finished
 
     init {
@@ -36,7 +36,9 @@ class DebugToolbarPanel(val project: Project) : JPanel(BorderLayout()) {
             }
 
             override fun updateState(state: DebuggerState) {
-                updateDebuggerState(state)
+                WriteCommandAction.runWriteCommandAction(project) {
+                    updateDebuggerState(state)
+                }
             }
 
             override fun navigateTo(filepath: String, lineNumber: Int) {
@@ -67,13 +69,13 @@ class DebugToolbarPanel(val project: Project) : JPanel(BorderLayout()) {
 
     private val resumeAction = object : AnAction("Resume", null, AllIcons.Actions.Resume) {
         override fun actionPerformed(e: AnActionEvent) {
-            publisher.resume()
+            publisher?.resume()
         }
     }
 
     private val stepOverAction = object : AnAction("Step Over", null, AllIcons.Debugger.ForceStepOver) {
         override fun actionPerformed(e: AnActionEvent) {
-            publisher.stepForward()
+            publisher?.stepForward()
         }
     }
 
