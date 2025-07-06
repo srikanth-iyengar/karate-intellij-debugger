@@ -38,5 +38,8 @@ bin/
 ### VS Code ###
 .vscode/
 
+### Kotline compiler ###
+.kotlin
+
 ### Mac OS ###
 .DS_Store

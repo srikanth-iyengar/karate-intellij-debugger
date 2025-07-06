@@ -1,9 +1,12 @@
 package `in`.srikanthk.devlabs.karatedebugger.service
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intuit.karate.Runner
+import `in`.srikanthk.devlabs.karatedebugger.configuration.KarateDebuggerConfiguration
 import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoResponseTopic
 import io.ktor.util.collections.*
 import java.io.File
@@ -20,6 +23,9 @@ import javax.xml.parsers.DocumentBuilderFactory
 class KarateExecutionService(val project: Project) {
 
     private val responsePublisher = project.messageBus.syncPublisher(DebuggerInfoResponseTopic.TOPIC)
+    val notificationGroup = NotificationGroupManager.getInstance()
+        .getNotificationGroup("Karate Debugger Notification")
+
     companion object {
         // key of filename and breakpoint line
         val BREAKPOINTS: MutableMap<String, ConcurrentSkipListSet<Int>> = ConcurrentMap();
@@ -44,23 +50,31 @@ class KarateExecutionService(val project: Project) {
                 .classLoader(classLoader)
             builder.parallel(1)
         }, executor)
+
+        future.get()
     }
 
     fun addBreakpoint(file: String, lineNumber: Int) {
         BREAKPOINTS.computeIfAbsent(file, { ConcurrentSkipListSet() }).add(lineNumber)
-        DaemonCodeAnalyzer.getInstance(project).restart()
     }
 
     fun removeBreakpoint(file: String, lineNumber: Int) {
         BREAKPOINTS[file]?.remove(lineNumber)
-        DaemonCodeAnalyzer.getInstance(project).restart()
     }
 
 
     private fun buildMavenProject(): Boolean {
         val projectPath = project.basePath;
+        val mavenState = KarateDebuggerConfiguration.getInstance()?.state;
+
+        if (mavenState?.mavenPath == null || mavenState.mavenPath.isBlank()) {
+            notificationGroup.createNotification("Maven home is not set", NotificationType.ERROR).notify(project)
+            return false
+        }
+
+        val command = "${mavenState?.mavenPath}/bin/${Constants.MAVEN_BUILDER_COMMAND}";
         val process =
-            ProcessBuilder(*Constants.MAVEN_BUILDER_COMMAND.split(" ").toTypedArray()).directory(File(projectPath))
+            ProcessBuilder(*command.split(" ").toTypedArray()).directory(File(projectPath))
                 .redirectOutput(ProcessBuilder.Redirect.PIPE).redirectError(ProcessBuilder.Redirect.PIPE).start()
 
         Thread {
@@ -87,7 +101,7 @@ class KarateExecutionService(val project: Project) {
         8,
         60,
         TimeUnit.SECONDS,
-        LinkedBlockingQueue<Runnable>(100)
+        LinkedBlockingQueue(100)
     ) { thread ->
         Thread(thread).apply {
             contextClassLoader = classloader
