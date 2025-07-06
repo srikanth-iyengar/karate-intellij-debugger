@@ -1,0 +1,38 @@
+<idea-plugin>
+    <id>in.srikanthk.devlabs.karate-debugger</id>
+
+    <name>Karate-Debugger</name>
+
+    <vendor url="https://devlab.srikanthk.in">DevLabs</vendor>
+
+    <description><![CDATA[This is ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.xdebugger</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language=""
+                                        implementationClass="in.srikanthk.devlabs.karatedebugger.ui.KarateLineMarkerProvider"/>
+        <toolWindow factoryClass="in.srikanthk.devlabs.karatedebugger.ui.DebugToolWindowFactory"
+                    id="Karate Chop Debugger" secondary="true" anchor="left"
+                    icon="AllIcons.Toolwindows.ToolWindowInspection"/>
+    </extensions>
+    <projectListeners>
+        <listener class="in.srikanthk.devlabs.karatedebugger.listener.KarateBreakpointListener"
+                  topic="com.intellij.xdebugger.breakpoints.XBreakpointListener"/>
+    </projectListeners>
+
+    <actions>
+        <action id="in.srikanthk.devlabs.karatedebugger.action.RunTestAction"
+                class="in.srikanthk.devlabs.karatedebugger.action.RunTestAction" text="Debug Test">
+            <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="GotoAction"/>
+        </action>
+        <action id="in.srikanthk.devlabs.karatedebugger.action.AddDebugPointAction"
+                class="in.srikanthk.devlabs.karatedebugger.action.AddDebugPointAction" text="Add Breakpoint">
+            <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="GotoAction"/>
+        </action>
+        <action id="in.srikanthk.devlabs.karatedebugger.action.RemoveDebugPointAction"
+                class="in.srikanthk.devlabs.karatedebugger.action.RemoveDebugPointAction" text="Remove Breakpoint">
+            <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="GotoAction"/>
+        </action>
+    </actions>
+</idea-plugin>
