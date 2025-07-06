@@ -27,6 +27,9 @@ class LogViewPanel(val project: Project) : JPanel(BorderLayout()) {
             }
 
             override fun updateState(state: DebuggerState) {
+                if(state == DebuggerState.Started) {
+                    consoleViewPanel.clear()
+                }
             }
         })
     }
@@ -35,7 +38,7 @@ class LogViewPanel(val project: Project) : JPanel(BorderLayout()) {
         val contentType = if (isError) {
             com.intellij.execution.ui.ConsoleViewContentType.ERROR_OUTPUT
         } else {
-            com.intellij.execution.ui.ConsoleViewContentType.NORMAL_OUTPUT
+            com.intellij.execution.ui.ConsoleViewContentType.LOG_INFO_OUTPUT
         }
 
 

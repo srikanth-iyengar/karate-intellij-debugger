@@ -17,6 +17,7 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.xdebugger.ui.DebuggerColors
 import com.intuit.karate.core.Variable
 import `in`.srikanthk.devlabs.karatedebugger.service.DebuggerState
+import `in`.srikanthk.devlabs.karatedebugger.service.KarateExecutionService
 import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoRequestTopic
 import `in`.srikanthk.devlabs.karatedebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
@@ -44,7 +45,7 @@ class DebugToolbarPanel(val project: Project) : JPanel(BorderLayout()) {
                 }
             }
 
-            override fun appendLog(log: String) {
+            override fun appendLog(log: String, isSuccess: Boolean) {
             }
         })
     }
@@ -57,6 +58,10 @@ class DebugToolbarPanel(val project: Project) : JPanel(BorderLayout()) {
         }
         this.stepOverAction.apply {
             setEnabled(state == DebuggerState.Halted)
+        }
+
+        if (state == DebuggerState.Finished) {
+            KarateExecutionService.BREAKPOINTS.keys.forEach { file -> cleanupMarkups(file) }
         }
     }
 
@@ -119,6 +124,17 @@ class DebugToolbarPanel(val project: Project) : JPanel(BorderLayout()) {
             )
 
             descriptor.navigate(true)
+        }
+    }
+
+    private fun cleanupMarkups(filepath: String) {
+        val virtualFile = LocalFileSystem.getInstance().findFileByPath(filepath)
+
+        if (virtualFile != null) {
+            val descriptor = OpenFileDescriptor(project, virtualFile, 0, 0)
+            val editor = FileEditorManager.getInstance(project).openTextEditor(descriptor, true) ?: return
+            val markupModel = editor.markupModel
+            markupModel.removeAllHighlighters()
         }
     }
 }

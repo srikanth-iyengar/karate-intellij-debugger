@@ -43,9 +43,11 @@ class DebugVariableTable(project: Project) : JPanel(BorderLayout()) {
             }
 
             override fun navigateTo(filepath: String, lineNumber: Int) {
+                // Not implemented
             }
 
-            override fun appendLog(log: String) {
+            override fun appendLog(log: String, isSuccess: Boolean) {
+                // Not implemented
             }
         })
 
