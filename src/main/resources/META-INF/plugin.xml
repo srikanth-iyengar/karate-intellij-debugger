@@ -6,7 +6,7 @@
     <vendor url="https://devlab.srikanthk.in">DevLabs</vendor>
 
     <description><![CDATA[
-  🥋 <b>Karate Chop Debugger</b> is an unofficial IntelliJ plugin that makes debugging Karate test cases a whole lot easier.
+  Karate Chop Debugger is an unofficial IntelliJ plugin that makes debugging Karate test cases a whole lot easier.
 
   Set breakpoints directly in your <code>.feature</code> files, run tests in debug mode, and inspect variables on the fly — all from the comfort of your IDE. No more scanning logs line by line to figure out what went wrong.
 

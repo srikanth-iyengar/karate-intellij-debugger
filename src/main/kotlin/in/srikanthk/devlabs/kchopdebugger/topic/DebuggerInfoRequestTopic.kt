@@ -10,5 +10,8 @@ interface DebuggerInfoRequestTopic {
     fun publishKarateVariables()
     fun stepForward()
     fun resume()
+    fun evaluateExpression(expression: String) {
+
+    }
 
 }
