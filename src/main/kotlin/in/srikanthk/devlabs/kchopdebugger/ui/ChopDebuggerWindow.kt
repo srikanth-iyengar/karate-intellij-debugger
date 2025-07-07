@@ -16,12 +16,14 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.components.panels.NonOpaquePanel
 import com.intellij.xdebugger.ui.DebuggerColors
+import com.intuit.karate.KarateException
 import com.intuit.karate.core.Variable
 import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
 import `in`.srikanthk.devlabs.kchopdebugger.service.KarateExecutionService
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoRequestTopic
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
+import java.util.Optional
 import javax.swing.JPanel
 
 class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) {
@@ -84,11 +86,16 @@ class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) 
                     updateDebuggerState(newState)
                 }
             }
+
             override fun navigateTo(filepath: String, lineNumber: Int) {
                 WriteCommandAction.runWriteCommandAction(project) {
                     focusTo(filepath, lineNumber)
                 }
             }
+
+            override fun evaluateExpressionResult(result: Optional<Variable>, error: Optional<KarateException>) {
+            }
+
             override fun appendLog(log: String, isSuccess: Boolean) {}
         })
     }

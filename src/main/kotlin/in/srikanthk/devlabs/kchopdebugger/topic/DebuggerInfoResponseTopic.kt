@@ -12,23 +12,9 @@ interface DebuggerInfoResponseTopic {
         val TOPIC = Topic.create("Karate Chop Debugger Response Topic", DebuggerInfoResponseTopic::class.java)
     }
 
-    fun updateKarateVariables(vars: Map<String, Variable>) {
-
-    }
-
-    fun updateState(state: DebuggerState) {
-
-    }
-
-    fun navigateTo(filepath: String, lineNumber: Int) {
-
-    }
-
-    fun appendLog(log: String, isSuccess: Boolean) {
-
-    }
-
-    fun evaluateExpressionResult(result: Optional<Variable>, error: Optional<KarateException>) {
-
-    }
+    fun updateKarateVariables(vars: Map<String, Variable>)
+    fun updateState(state: DebuggerState)
+    fun navigateTo(filepath: String, lineNumber: Int)
+    fun appendLog(log: String, isSuccess: Boolean)
+    fun evaluateExpressionResult(result: Optional<Variable>, error: Optional<KarateException>)
 }

@@ -129,6 +129,12 @@ class DebugVariableTable(project: Project) : JPanel(BorderLayout()) {
                     resultField.text = "[null]"
                 }
             }
+
+            override fun appendLog(log: String, isSuccess: Boolean) {
+            }
+
+            override fun navigateTo(filepath: String, lineNumber: Int) {
+            }
         })
 
         resultField.addMouseListener(object : java.awt.event.MouseAdapter() {

@@ -2,10 +2,12 @@ package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.project.Project
+import com.intuit.karate.KarateException
 import com.intuit.karate.core.Variable
 import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
+import java.util.Optional
 import javax.swing.JPanel
 
 class LogViewPanel(val project: Project) : JPanel(BorderLayout()) {
@@ -15,6 +17,9 @@ class LogViewPanel(val project: Project) : JPanel(BorderLayout()) {
     init {
         add(consoleViewPanel.component, BorderLayout.CENTER)
         messageBus.subscribe(DebuggerInfoResponseTopic.TOPIC, object : DebuggerInfoResponseTopic {
+            override fun evaluateExpressionResult(result: Optional<Variable>, error: Optional<KarateException>) {
+                TODO("Not yet implemented")
+            }
 
             override fun appendLog(log: String, isSuccess: Boolean) {
                 addLog(log, isSuccess)

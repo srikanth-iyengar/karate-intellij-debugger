@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "in.srikanthk.devlabs"
-version = "1.0.0-alpha"
+version = "1.1.0-alpha"
 
 repositories {
     mavenCentral()
