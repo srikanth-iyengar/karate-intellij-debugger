@@ -1,6 +1,7 @@
 package `in`.srikanthk.devlabs.kchopdebugger.service
 
 import com.intellij.openapi.project.Project
+import com.intuit.karate.KarateException
 import com.intuit.karate.RuntimeHook
 import com.intuit.karate.Suite
 import com.intuit.karate.core.ScenarioRuntime
@@ -9,6 +10,7 @@ import com.intuit.karate.core.StepResult
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoRequestTopic
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.io.File
+import java.util.*
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.CountDownLatch
 
@@ -44,7 +46,8 @@ class DebugHook(private val breakpoints: MutableMap<String, ConcurrentSkipListSe
             publisher?.updateKarateVariables(sr?.engine!!.vars)
             publisher?.updateState(DebuggerState.Halted)
             publisher?.navigateTo(filepath, startLine)
-            project.messageBus.connect().subscribe(DebuggerInfoRequestTopic.TOPIC, object : DebuggerInfoRequestTopic {
+            val connection = project.messageBus.connect()
+            connection.subscribe(DebuggerInfoRequestTopic.TOPIC, object : DebuggerInfoRequestTopic {
                 override fun publishKarateVariables() {
                     publisher?.updateKarateVariables(sr?.engine!!.vars)
                 }
@@ -58,9 +61,21 @@ class DebugHook(private val breakpoints: MutableMap<String, ConcurrentSkipListSe
                 override fun resume() {
                     latch.countDown()
                 }
+
+                override fun evaluateExpression(expression: String) {
+                    try {
+                        val response = sr?.engine?.evalJs(expression)
+                        publisher?.evaluateExpressionResult(Optional.ofNullable(response), Optional.empty())
+                    } catch (e: KarateException) {
+                        publisher?.evaluateExpressionResult(Optional.empty(), Optional.of(e))
+                    } finally {
+                        publisher?.updateKarateVariables(sr?.engine?.vars ?: mapOf())
+                    }
+                }
             })
 
             latch.await()
+            connection.disconnect()
         }
 
         return super.beforeStep(step, sr)

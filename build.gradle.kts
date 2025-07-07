@@ -1,11 +1,10 @@
-import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
+import java.nio.file.Files
+import java.nio.file.Paths
 
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
     id("org.jetbrains.intellij.platform") version "2.5.0"
-    // https://mvnrepository.com/artifact/org.jetbrains.maven/info-maven3-plugin
-//    implementation("org.jetbrains.maven:info-maven3-plugin:1.0.2")
 }
 
 group = "in.srikanthk.devlabs"
@@ -16,18 +15,12 @@ repositories {
     intellijPlatform {
         defaultRepositories()
     }
-
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
     intellijPlatform {
         create("IC", "2025.1")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
-
-        // Add necessary plugin dependencies for compilation here, example:
-        // bundledPlugin("com.intellij.java")
     }
 
     implementation("com.intuit.karate:karate-junit5:1.4.1")
@@ -40,18 +33,40 @@ intellijPlatform {
         }
 
         changeNotes = """
-      Initial version
-    """.trimIndent()
+            Initial version
+        """.trimIndent()
     }
 }
 
 tasks {
-    // Set the JVM compatibility versions
     withType<JavaCompile> {
         sourceCompatibility = "21"
         targetCompatibility = "21"
     }
+
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "21"
+    }
+
+    signPlugin {
+        val certPath = System.getenv("CERTIFICATE_CHAIN_PATH")
+        val keyPath = System.getenv("PRIVATE_KEY_PATH")
+        val certPassword = System.getenv("PRIVATE_KEY_PASSWORD")
+
+        println("🔐 Starting plugin signing process...")
+        println("🔍 CERTIFICATE_CHAIN_PATH = $certPath")
+        println("🔍 PRIVATE_KEY_PATH = $keyPath")
+        println("🔍 PRIVATE_KEY_PASSWORD = ${if (certPassword != null) "***" else "NOT SET"}")
+
+        val certFile = Paths.get(certPath)
+        val keyFile = Paths.get(keyPath)
+
+        val certContent = Files.readString(certFile).trim()
+        val keyContent = Files.readString(keyFile).trim()
+
+        println("✅ Certificate and key files loaded successfully.")
+        certificateChain.set(certContent)
+        privateKey.set(keyContent)
+        password.set(certPassword)
     }
 }

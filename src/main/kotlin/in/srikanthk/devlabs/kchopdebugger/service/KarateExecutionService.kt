@@ -6,6 +6,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intuit.karate.Runner
 import `in`.srikanthk.devlabs.kchopdebugger.configuration.KarateDebuggerConfiguration
+import `in`.srikanthk.devlabs.kchopdebugger.topic.BreakpointUpdatedTopic
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import io.ktor.util.collections.ConcurrentMap
 import kotlinx.io.IOException
@@ -21,6 +22,7 @@ class KarateExecutionService(val project: Project) {
     private val responsePublisher = project.messageBus.syncPublisher(DebuggerInfoResponseTopic.TOPIC)
     val notificationGroup = NotificationGroupManager.getInstance()
         .getNotificationGroup("Karate Chop Debugger Notification")
+    val breakpointUpdatePublisher = project.messageBus.syncPublisher(BreakpointUpdatedTopic.TOPIC)
 
     companion object {
         // key of filename and breakpoint line
@@ -51,11 +53,13 @@ class KarateExecutionService(val project: Project) {
     }
 
     fun addBreakpoint(file: String, lineNumber: Int) {
-        BREAKPOINTS.computeIfAbsent(file, { ConcurrentSkipListSet() }).add(lineNumber)
+        BREAKPOINTS.computeIfAbsent(file) { ConcurrentSkipListSet() }.add(lineNumber)
+        breakpointUpdatePublisher.updatedBreakpoint()
     }
 
     fun removeBreakpoint(file: String, lineNumber: Int) {
         BREAKPOINTS[file]?.remove(lineNumber)
+        breakpointUpdatePublisher.updatedBreakpoint()
     }
 
 
@@ -68,7 +72,7 @@ class KarateExecutionService(val project: Project) {
             return false
         }
 
-        val command = "${mavenState?.mavenPath}/bin/${Constants.MAVEN_BUILDER_COMMAND}";
+        val command = "${mavenState.mavenPath}/bin/${Constants.MAVEN_BUILDER_COMMAND}";
         try {
             val process =
                 ProcessBuilder(*command.split(" ").toTypedArray()).directory(File(projectPath))

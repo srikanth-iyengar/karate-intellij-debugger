@@ -40,6 +40,8 @@ bin/
 
 ### Kotline compiler ###
 .kotlin
+.run
+.intellijPlatform
 
 ### Mac OS ###
 .DS_Store
