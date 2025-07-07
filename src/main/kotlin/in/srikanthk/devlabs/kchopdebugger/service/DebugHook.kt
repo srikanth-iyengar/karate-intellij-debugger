@@ -70,6 +70,7 @@ class DebugHook(private val breakpoints: MutableMap<String, ConcurrentSkipListSe
                         publisher?.evaluateExpressionResult(Optional.empty(), Optional.of(e))
                     } finally {
                         publisher?.updateKarateVariables(sr?.engine?.vars ?: mapOf())
+                        sr?.engine?.failedReason = null
                     }
                 }
             })
