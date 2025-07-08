@@ -42,6 +42,7 @@ class KarateExecutionService(val project: Project) {
                 val builder = Runner
                     .path("classpath:${featureClasspath}")
                     .hook(DebugHook(BREAKPOINTS, project))
+                    .reportDir(File(project.basePath, "karate-report").path.toString())
                     .classLoader(classLoader)
                 builder.parallel(1)
             }, executor)
@@ -101,8 +102,7 @@ class KarateExecutionService(val project: Project) {
     }
 
     private fun getJarPath(): String {
-        val pomPath = "${project.basePath}/pom.xml"
-        val file = File(pomPath);
+        val file = File("${project.basePath}", "pom.xml")
         val dbFactory = DocumentBuilderFactory.newInstance()
         val dBuilder = dbFactory.newDocumentBuilder()
         val doc = dBuilder.parse(file)
@@ -111,8 +111,13 @@ class KarateExecutionService(val project: Project) {
         val version = doc.getElementsByTagName("version").item(0).textContent
 
         val testJarFileName = "$artifactId-$version-tests.jar"
-        return "${project.basePath}/target/${testJarFileName}"
+
+        // Correct and portable file path resolution
+        val jarFile = File(File(project.basePath, "target"), testJarFileName)
+
+        return jarFile.path.toString()
     }
+
 
     private fun getDynamicClassLoader(): ClassLoader {
         return URLClassLoader(arrayOf(File(getJarPath()).toURI().toURL()), Thread.currentThread().contextClassLoader)

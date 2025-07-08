@@ -18,7 +18,6 @@ class LogViewPanel(val project: Project) : JPanel(BorderLayout()) {
         add(consoleViewPanel.component, BorderLayout.CENTER)
         messageBus.subscribe(DebuggerInfoResponseTopic.TOPIC, object : DebuggerInfoResponseTopic {
             override fun evaluateExpressionResult(result: Optional<Variable>, error: Optional<KarateException>) {
-                TODO("Not yet implemented")
             }
 
             override fun appendLog(log: String, isSuccess: Boolean) {

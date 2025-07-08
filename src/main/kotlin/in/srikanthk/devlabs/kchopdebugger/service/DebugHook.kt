@@ -91,6 +91,6 @@ class DebugHook(private val breakpoints: MutableMap<String, ConcurrentSkipListSe
 
     override fun afterSuite(suite: Suite?) {
         publisher?.updateState(DebuggerState.Finished)
-        publisher?.appendLog("Report dir: ${File(suite?.reportDir).toPath().toUri()}/karate-summary.html", true)
+        publisher?.appendLog("Report dir: ${File(suite?.reportDir, "karate-summary.html").toPath().toUri()}", true)
     }
 }
