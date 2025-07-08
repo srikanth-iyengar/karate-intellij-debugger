@@ -1,5 +1,6 @@
 package `in`.srikanthk.devlabs.kchopdebugger.ui
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.project.Project
 import com.intellij.ui.CheckboxTree
 import com.intellij.ui.CheckedTreeNode
@@ -112,6 +113,7 @@ class BreakpointEditorPanel(private val project: Project) : JPanel(BorderLayout(
             }
         }
         expandAll(tree, TreePath(root))
+        DaemonCodeAnalyzer.getInstance(project).restart()
     }
 
     private fun expandAll(tree: JTree, parent: TreePath) {

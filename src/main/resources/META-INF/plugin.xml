@@ -27,6 +27,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.xdebugger</depends>
+    <depends>org.jetbrains.idea.maven</depends>
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language=""
                                         implementationClass="in.srikanthk.devlabs.kchopdebugger.ui.KarateLineMarkerProvider"/>

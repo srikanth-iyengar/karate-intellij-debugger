@@ -5,11 +5,12 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intuit.karate.Runner
-import `in`.srikanthk.devlabs.kchopdebugger.configuration.KarateDebuggerConfiguration
 import `in`.srikanthk.devlabs.kchopdebugger.topic.BreakpointUpdatedTopic
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import io.ktor.util.collections.ConcurrentMap
-import kotlinx.io.IOException
+import org.jetbrains.idea.maven.execution.MavenRunner
+import org.jetbrains.idea.maven.execution.MavenRunnerParameters
+import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.io.File
 import java.net.URLClassLoader
 import java.util.concurrent.*
@@ -30,26 +31,24 @@ class KarateExecutionService(val project: Project) {
     }
 
     fun executeSuite(fileName: String) {
-        val isProjectBuilt = buildMavenProject();
-        if (!isProjectBuilt) {
-            return
-        }
+        val isProjectBuilt = buildMavenProject({
+            val projectBasePath = project.basePath + Constants.JAVA_BASE_PATH
+            val featureClasspath = fileName.substring(projectBasePath.length + 1)
 
-        val projectBasePath = project.basePath + Constants.JAVA_BASE_PATH
-        val featureClasspath = fileName.substring(projectBasePath.length + 1)
+            val classLoader = getDynamicClassLoader()
+            val executor = getThreadPool(classLoader)
 
-        val classLoader = getDynamicClassLoader()
-        val executor = getThreadPool(classLoader)
+            val future = CompletableFuture.supplyAsync({
+                val builder = Runner
+                    .path("classpath:${featureClasspath}")
+                    .hook(DebugHook(BREAKPOINTS, project))
+                    .classLoader(classLoader)
+                builder.parallel(1)
+            }, executor)
 
-        val future = CompletableFuture.supplyAsync({
-            val builder = Runner
-                .path("classpath:${featureClasspath}")
-                .hook(DebugHook(BREAKPOINTS, project))
-                .classLoader(classLoader)
-            builder.parallel(1)
-        }, executor)
+            future.get()
 
-        future.get()
+        });
     }
 
     fun addBreakpoint(file: String, lineNumber: Int) {
@@ -63,42 +62,29 @@ class KarateExecutionService(val project: Project) {
     }
 
 
-    private fun buildMavenProject(): Boolean {
-        val projectPath = project.basePath;
-        val mavenState = KarateDebuggerConfiguration.getInstance()?.state;
+    private fun buildMavenProject(callback: Runnable): Boolean {
+        val mavenProjectManager = MavenProjectsManager.getInstance(project);
+        val mavenProjects = mavenProjectManager.projects;
 
-        if (mavenState?.mavenPath == null || mavenState.mavenPath.isBlank()) {
-            notificationGroup.createNotification("Karate chop error", "Maven home is not set",NotificationType.ERROR).notify(project)
+        if(mavenProjects.isEmpty()) {
+            notificationGroup.createNotification("Karate chop error", "No maven projects detected",NotificationType.ERROR).notify(project)
             return false
         }
 
-        val command = "${mavenState.mavenPath}/bin/${Constants.MAVEN_BUILDER_COMMAND}";
-        try {
-            val process =
-                ProcessBuilder(*command.split(" ").toTypedArray()).directory(File(projectPath))
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE).redirectError(ProcessBuilder.Redirect.PIPE).start()
+        val runner = MavenRunner.getInstance(project)
+        val mavenProject = mavenProjects.first()
 
-            Thread {
-                process.errorStream.bufferedReader().use { reader ->
-                    reader.lineSequence().forEach { line ->
-                        responsePublisher.appendLog(line, true)
-                    }
-                }
-            }.start()
+        val pomFile = File(mavenProject.file.path)
+        val parameters = MavenRunnerParameters(
+            true,
+            pomFile.parent,
+            listOf("clean", "package", "-DskipTests=true"),
+            emptyList<String>(),
+            null
+        )
 
-            Thread {
-                process.inputStream.bufferedReader().use { reader ->
-                    reader.lineSequence().forEach { line ->
-                        responsePublisher.appendLog(line, false)
-                    }
-                }
-            }.start()
-
-            return process.waitFor() == 0
-        } catch (e: IOException) {
-            notificationGroup.createNotification("Karate Chop error", "Failed to run test ${e.message}",NotificationType.ERROR).notify(project)
-            return false
-        }
+        runner.run(parameters, null, callback)
+        return true
     }
 
     private fun getThreadPool(classloader: ClassLoader): ThreadPoolExecutor = ThreadPoolExecutor(

@@ -21,6 +21,7 @@ dependencies {
     intellijPlatform {
         create("IC", "2025.1")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
+        bundledPlugin("org.jetbrains.idea.maven")
     }
 
     implementation("com.intuit.karate:karate-junit5:1.4.1")
