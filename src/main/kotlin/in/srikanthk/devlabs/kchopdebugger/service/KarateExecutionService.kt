@@ -23,7 +23,8 @@ class KarateExecutionService(val project: Project) {
     private val responsePublisher = project.messageBus.syncPublisher(DebuggerInfoResponseTopic.TOPIC)
     val notificationGroup = NotificationGroupManager.getInstance()
         .getNotificationGroup("Karate Chop Debugger Notification")
-    val breakpointUpdatePublisher = project.messageBus.syncPublisher(BreakpointUpdatedTopic.TOPIC)
+    val breakpointUpdatePublisher: BreakpointUpdatedTopic? =
+        project.messageBus.syncPublisher(BreakpointUpdatedTopic.TOPIC)
 
     companion object {
         // key of filename and breakpoint line
@@ -31,35 +32,41 @@ class KarateExecutionService(val project: Project) {
     }
 
     fun executeSuite(fileName: String) {
-        val isProjectBuilt = buildMavenProject({
+        buildMavenProject({
             val projectBasePath = project.basePath + Constants.JAVA_BASE_PATH
             val featureClasspath = fileName.substring(projectBasePath.length + 1)
 
+
             val classLoader = getDynamicClassLoader()
-            val executor = getThreadPool(classLoader)
+            try {
+                classLoader.use { cl ->
+                    val executor = getThreadPool(cl)
+                    val future = CompletableFuture.supplyAsync({
+                        PatchKarateRunner().emptyFun()
+                        val builder = Runner
+                            .path("classpath:${featureClasspath}")
+                            .hook(DebugHook(BREAKPOINTS, project))
+                            .reportDir(File(project.basePath, "karate-report").path.toString())
+                            .classLoader(cl)
+                        builder.parallel(1)
+                    }, executor)
+                    future.get()
+                    executor.shutdown()
+                }
+            } finally {
 
-            val future = CompletableFuture.supplyAsync({
-                val builder = Runner
-                    .path("classpath:${featureClasspath}")
-                    .hook(DebugHook(BREAKPOINTS, project))
-                    .reportDir(File(project.basePath, "karate-report").path.toString())
-                    .classLoader(classLoader)
-                builder.parallel(1)
-            }, executor)
-
-            future.get()
-
-        });
+            }
+        })
     }
 
     fun addBreakpoint(file: String, lineNumber: Int) {
         BREAKPOINTS.computeIfAbsent(file) { ConcurrentSkipListSet() }.add(lineNumber)
-        breakpointUpdatePublisher.updatedBreakpoint()
+        breakpointUpdatePublisher?.updatedBreakpoint()
     }
 
     fun removeBreakpoint(file: String, lineNumber: Int) {
         BREAKPOINTS[file]?.remove(lineNumber)
-        breakpointUpdatePublisher.updatedBreakpoint()
+        breakpointUpdatePublisher?.updatedBreakpoint()
     }
 
 
@@ -67,8 +74,12 @@ class KarateExecutionService(val project: Project) {
         val mavenProjectManager = MavenProjectsManager.getInstance(project);
         val mavenProjects = mavenProjectManager.projects;
 
-        if(mavenProjects.isEmpty()) {
-            notificationGroup.createNotification("Karate chop error", "No maven projects detected",NotificationType.ERROR).notify(project)
+        if (mavenProjects.isEmpty()) {
+            notificationGroup.createNotification(
+                "Karate chop error",
+                "No maven projects detected",
+                NotificationType.ERROR
+            ).notify(project)
             return false
         }
 
@@ -119,7 +130,7 @@ class KarateExecutionService(val project: Project) {
     }
 
 
-    private fun getDynamicClassLoader(): ClassLoader {
+    private fun getDynamicClassLoader(): URLClassLoader {
         return URLClassLoader(arrayOf(File(getJarPath()).toURI().toURL()), Thread.currentThread().contextClassLoader)
     }
 
