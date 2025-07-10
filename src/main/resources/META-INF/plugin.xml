@@ -36,6 +36,8 @@
                     icon="AllIcons.Toolwindows.ToolWindowInspection"/>
         <applicationService
                 serviceImplementation="in.srikanthk.devlabs.kchopdebugger.configuration.KarateDebuggerConfiguration"/>
+        <applicationService
+                    serviceImplementation="in.srikanthk.devlabs.kchopdebugger.configuration.KaratePropertiesState"/>
         <applicationConfigurable
                 parentId="tools"
                 instance="in.srikanthk.devlabs.kchopdebugger.ui.AppSettingsConfigurable"

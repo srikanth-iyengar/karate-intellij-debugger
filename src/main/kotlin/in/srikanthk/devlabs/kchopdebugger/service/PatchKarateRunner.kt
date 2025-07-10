@@ -3,40 +3,54 @@ package `in`.srikanthk.devlabs.kchopdebugger.service
 import io.github.classgraph.ClassGraph
 import io.github.classgraph.ScanResult
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 
-// Hack for plugin to work in win environment
 class PatchKarateRunner {
     companion object {
-        // 1. Create your custom ScanResult
-        val customScanResult: ScanResult = ClassGraph().acceptPaths("/").overrideClassLoaders(
-            this::class.java.classLoader, Thread.currentThread().contextClassLoader
-        ).scan(1)
+        val customScanResult: ScanResult = ClassGraph()
+            .acceptPaths("/")
+            .overrideClassLoaders(
+                PatchKarateRunner::class.java.classLoader,
+                Thread.currentThread().contextClassLoader
+            )
+            .scan(1)
+
     }
 
-
-    fun emptyFun() {
+    fun patch() {
         try {
-            // 2. Access the ResourceUtils class
-            val clazz = Class.forName("com.intuit.karate.resource.ResourceUtils", false, this.javaClass.classLoader)
+            val clazz = Class.forName(
+                "com.intuit.karate.resource.ResourceUtils"
+            )
 
-            // 3. Get the SCAN_RESULT field
+            clazz.modifiers;
+        } catch (e: ClassNotFoundException) {
+
+        }
+        try {
+            val clazz = Class.forName(
+                "com.intuit.karate.resource.ResourceUtils",
+                false,
+                PatchKarateRunner::class.java.classLoader
+            )
+
             val field: Field = clazz.getDeclaredField("SCAN_RESULT")
             field.isAccessible = true
 
-            // 4. Remove final modifier using reflection hack
-            val modifiersField = Field::class.java.getDeclaredField("modifiers")
-            modifiersField.isAccessible = true
-            modifiersField.setInt(field, field.modifiers and Modifier.FINAL.inv())
+            // Remove final (Java 12+ doesn't allow changing 'modifiers' directly, so we rely on accessible + setting)
+            val theUnsafe = sun.misc.Unsafe::class.java.getDeclaredField("theUnsafe")
+            theUnsafe.isAccessible = true
+            val unsafe = theUnsafe.get(null) as sun.misc.Unsafe
+            println("Thread: ${Thread.currentThread()} ${Thread.currentThread().name}")
 
-            // 5. Set your custom ScanResult
-            field.set(null, customScanResult)
+            val staticFieldBase = unsafe.staticFieldBase(field)
+            val staticFieldOffset = unsafe.staticFieldOffset(field)
+
+            unsafe.putObject(staticFieldBase, staticFieldOffset, customScanResult)
 
             println("✅ Patched SCAN_RESULT in ResourceUtils")
         } catch (e: Exception) {
             e.printStackTrace()
             println("❌ Failed to patch SCAN_RESULT: ${e.message}")
         }
-
     }
 }

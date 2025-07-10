@@ -2,6 +2,7 @@ package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intuit.karate.KarateException
 import com.intuit.karate.core.Variable
 import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState

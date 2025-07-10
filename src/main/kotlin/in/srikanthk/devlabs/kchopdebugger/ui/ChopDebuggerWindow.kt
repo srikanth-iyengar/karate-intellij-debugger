@@ -13,6 +13,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.components.panels.NonOpaquePanel
 import com.intellij.xdebugger.ui.DebuggerColors
@@ -32,6 +33,7 @@ class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) 
     private val logViewPanel = LogViewPanel(project)
     private val breakpointsPanel = BreakpointEditorPanel(project)
     private val tabbedPane = JBTabbedPane()
+    private val karatePropertiesPanel = PropertiesEditorPanel()
     private var state: DebuggerState = DebuggerState.Finished
     private val publisher: DebuggerInfoRequestTopic? = project.messageBus.syncPublisher(DebuggerInfoRequestTopic.TOPIC)
 
@@ -66,7 +68,7 @@ class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) 
             addTab("Variables", debugVarsPanel)
             addTab("Logs", logViewPanel)
             addTab("Breakpoints", breakpointsPanel)
-            // Future: addTab("Breakpoints", BreakpointEditorPanel(project))
+            addTab("Run Properties", karatePropertiesPanel)
         }
 
         val centerPanel = NonOpaquePanel(BorderLayout()).apply {
@@ -81,9 +83,9 @@ class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) 
         // -- Subscribe to debugger updates
         project.messageBus.connect().subscribe(DebuggerInfoResponseTopic.TOPIC, object : DebuggerInfoResponseTopic {
             override fun updateKarateVariables(vars: Map<String, Variable>) {}
-            override fun updateState(newState: DebuggerState) {
+            override fun updateState(state: DebuggerState) {
                 WriteCommandAction.runWriteCommandAction(project) {
-                    updateDebuggerState(newState)
+                    updateDebuggerState(state)
                 }
             }
 
@@ -102,11 +104,14 @@ class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) 
 
     private fun updateDebuggerState(newState: DebuggerState) {
         state = newState
-//        resumeAction.templatePresentation.isEnabled = (state == DebuggerState.Halted)
-//        stepOverAction.templatePresentation.isEnabled = (state == DebuggerState.Halted)
 
         if (state == DebuggerState.Finished) {
             KarateExecutionService.BREAKPOINTS.keys.forEach { cleanupMarkups(it) }
+        }
+
+        if(state == DebuggerState.Started) {
+            ToolWindowManager.getInstance(project).getToolWindow("Karate Chop Debugger")?.show()
+            this.tabbedPane.selectedIndex = 0
         }
     }
 

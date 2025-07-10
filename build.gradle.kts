@@ -25,6 +25,9 @@ dependencies {
     }
 
     implementation("com.intuit.karate:karate-junit5:1.4.1")
+    implementation("net.bytebuddy:byte-buddy:1.14.12")
+    implementation("net.bytebuddy:byte-buddy-agent:1.14.12")
+
 }
 
 intellijPlatform {
@@ -59,15 +62,17 @@ tasks {
         println("🔍 PRIVATE_KEY_PATH = $keyPath")
         println("🔍 PRIVATE_KEY_PASSWORD = ${if (certPassword != null) "***" else "NOT SET"}")
 
-        val certFile = Paths.get(certPath)
-        val keyFile = Paths.get(keyPath)
+        if(certPath != null && keyPath != null) {
+            val certFile = Paths.get(certPath)
+            val keyFile = Paths.get(keyPath)
 
-        val certContent = Files.readString(certFile).trim()
-        val keyContent = Files.readString(keyFile).trim()
+            val certContent = Files.readString(certFile).trim()
+            val keyContent = Files.readString(keyFile).trim()
 
-        println("✅ Certificate and key files loaded successfully.")
-        certificateChain.set(certContent)
-        privateKey.set(keyContent)
-        password.set(certPassword)
+            println("✅ Certificate and key files loaded successfully.")
+            certificateChain.set(certContent)
+            privateKey.set(keyContent)
+            password.set(certPassword)
+        }
     }
 }

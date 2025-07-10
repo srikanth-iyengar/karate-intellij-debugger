@@ -5,22 +5,26 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intuit.karate.Runner
+import com.intuit.karate.resource.ResourceUtils
+import `in`.srikanthk.devlabs.kchopdebugger.configuration.KaratePropertiesState
 import `in`.srikanthk.devlabs.kchopdebugger.topic.BreakpointUpdatedTopic
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
+import io.github.classgraph.ClassGraph
 import io.ktor.util.collections.ConcurrentMap
 import org.jetbrains.idea.maven.execution.MavenRunner
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.io.File
+import java.net.URL
 import java.net.URLClassLoader
 import java.util.concurrent.*
 import javax.xml.parsers.DocumentBuilderFactory
-
 
 @Service(Service.Level.PROJECT)
 class KarateExecutionService(val project: Project) {
 
     private val responsePublisher = project.messageBus.syncPublisher(DebuggerInfoResponseTopic.TOPIC)
+    private val runPropertiesService = KaratePropertiesState.getInstance()
     val notificationGroup = NotificationGroupManager.getInstance()
         .getNotificationGroup("Karate Chop Debugger Notification")
     val breakpointUpdatePublisher: BreakpointUpdatedTopic? =
@@ -42,17 +46,27 @@ class KarateExecutionService(val project: Project) {
                 classLoader.use { cl ->
                     val executor = getThreadPool(cl)
                     val future = CompletableFuture.supplyAsync({
-                        PatchKarateRunner().emptyFun()
+                        ResourceUtils.SCAN_RESULT = ClassGraph().overrideClassLoaders(
+                            Thread.currentThread().getContextClassLoader(),
+                            ResourceUtils::class.java.getClassLoader()
+                        ).acceptPaths("/").scan(1);
                         val builder = Runner
                             .path("classpath:${featureClasspath}")
                             .hook(DebugHook(BREAKPOINTS, project))
+                            .backupReportDir(false)
                             .reportDir(File(project.basePath, "karate-report").path.toString())
                             .classLoader(cl)
+
+                        runPropertiesService?.state?.entries?.forEach { (key, value) ->
+                            builder.systemProperty(key.toString(), value.toString())
+                        }
                         builder.parallel(1)
+                        ResourceUtils.SCAN_RESULT = null
                     }, executor)
                     future.get()
                     executor.shutdown()
                 }
+                classLoader.close()
             } finally {
 
             }
@@ -94,9 +108,17 @@ class KarateExecutionService(val project: Project) {
             emptyList<String>(),
             null
         )
+        mavenProject.dependencies
 
         runner.run(parameters, null, callback)
         return true
+    }
+
+    private fun getMavenDependenciesURL(): List<URL> {
+        val mavenProjectManager = MavenProjectsManager.getInstance(project);
+        val mavenProjects = mavenProjectManager.projects;
+
+        return mavenProjects[0].dependencies.map { dep -> dep.file.toURI().toURL() }
     }
 
     private fun getThreadPool(classloader: ClassLoader): ThreadPoolExecutor = ThreadPoolExecutor(
@@ -129,9 +151,10 @@ class KarateExecutionService(val project: Project) {
         return jarFile.path.toString()
     }
 
-
     private fun getDynamicClassLoader(): URLClassLoader {
-        return URLClassLoader(arrayOf(File(getJarPath()).toURI().toURL()), Thread.currentThread().contextClassLoader)
+        val depUrls = ArrayList<URL>(getMavenDependenciesURL())
+        depUrls.add(File(getJarPath()).toURI().toURL());
+        return URLClassLoader(depUrls.toTypedArray(), null)
     }
 
     fun isBreakpointPlaced(file: String, lineNumber: Int): Boolean {
