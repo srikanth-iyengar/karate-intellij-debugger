@@ -43,30 +43,29 @@ class KarateExecutionService(val project: Project) {
 
             val classLoader = getDynamicClassLoader()
             try {
-                classLoader.use { cl ->
-                    val executor = getThreadPool(cl)
-                    val future = CompletableFuture.supplyAsync({
-                        ResourceUtils.SCAN_RESULT = ClassGraph().overrideClassLoaders(
-                            Thread.currentThread().getContextClassLoader(),
-                            ResourceUtils::class.java.getClassLoader()
-                        ).acceptPaths("/").scan(1);
-                        val builder = Runner
-                            .path("classpath:${featureClasspath}")
-                            .hook(DebugHook(BREAKPOINTS, project))
-                            .backupReportDir(false)
-                            .reportDir(File(project.basePath, "karate-report").path.toString())
-                            .classLoader(cl)
+                val runnerThread = Thread {
+                    ResourceUtils.SCAN_RESULT = ClassGraph().overrideClassLoaders(
+                        Thread.currentThread().getContextClassLoader(),
+                        ResourceUtils::class.java.getClassLoader()
+                    ).acceptPaths("/").scan(1);
+                    val builder = Runner
+                        .path("classpath:${featureClasspath}")
+                        .hook(DebugHook(BREAKPOINTS, project))
+                        .backupReportDir(false)
+                        .reportDir(File(project.basePath, "karate-report").path.toString())
 
-                        runPropertiesService?.state?.entries?.forEach { (key, value) ->
-                            builder.systemProperty(key.toString(), value.toString())
-                        }
-                        builder.parallel(1)
-                        ResourceUtils.SCAN_RESULT = null
-                    }, executor)
-                    future.get()
-                    executor.shutdown()
+                    runPropertiesService?.state?.entries?.forEach { (key, value) ->
+                        builder.systemProperty(key.toString(), value.toString())
+                    }
+                    builder.parallel(1)
+                    ResourceUtils.SCAN_RESULT = null
                 }
+                runnerThread.contextClassLoader = classLoader
+                runnerThread.start()
+                runnerThread.join()
                 classLoader.close()
+            } catch (e: Exception) {
+                println(e.message)
             } finally {
 
             }
@@ -121,19 +120,6 @@ class KarateExecutionService(val project: Project) {
         return mavenProjects[0].dependencies.map { dep -> dep.file.toURI().toURL() }
     }
 
-    private fun getThreadPool(classloader: ClassLoader): ThreadPoolExecutor = ThreadPoolExecutor(
-        4,
-        8,
-        60,
-        TimeUnit.SECONDS,
-        LinkedBlockingQueue(100)
-    ) { thread ->
-        Thread(thread).apply {
-            contextClassLoader = classloader
-            name = "karate-chop-debugger-${System.currentTimeMillis()}"
-        }
-    }
-
     private fun getJarPath(): String {
         val file = File("${project.basePath}", "pom.xml")
         val dbFactory = DocumentBuilderFactory.newInstance()
@@ -153,8 +139,23 @@ class KarateExecutionService(val project: Project) {
 
     private fun getDynamicClassLoader(): URLClassLoader {
         val depUrls = ArrayList<URL>(getMavenDependenciesURL())
-        depUrls.add(File(getJarPath()).toURI().toURL());
+        if(System.getProperty("os.name").lowercase().contains("win")) {
+            depUrls.add(createTempJarCopy(File(getJarPath())).toURI().toURL())
+        } else {
+            depUrls.add(createTempJarCopy(File(getJarPath())).toURI().toURL());
+        }
         return URLClassLoader(depUrls.toTypedArray(), null)
+    }
+
+    private fun createTempJarCopy(originalJar: File): File {
+        val tempJar = File.createTempFile("unlocked-${System.currentTimeMillis()}", ".jar")
+        originalJar.inputStream().use { input ->
+            tempJar.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        tempJar.deleteOnExit()
+        return tempJar
     }
 
     fun isBreakpointPlaced(file: String, lineNumber: Int): Boolean {
