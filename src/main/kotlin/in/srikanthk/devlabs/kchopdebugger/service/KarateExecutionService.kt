@@ -29,6 +29,21 @@ class KarateExecutionService(val project: Project) {
         .getNotificationGroup("Karate Chop Debugger Notification")
     val breakpointUpdatePublisher: BreakpointUpdatedTopic? =
         project.messageBus.syncPublisher(BreakpointUpdatedTopic.TOPIC)
+    private val tempFilesToDelete = ConcurrentLinkedQueue<File>()
+    private val tempFileCleaner: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor { runnable ->
+        Thread(runnable).apply {
+            isDaemon = true
+            name = "TempFileCleaner"
+        }
+    }
+
+
+    init {
+        if (System.getProperty("os.name").lowercase().contains("win")) {
+            startTempCleaner()
+        }
+    }
+
 
     companion object {
         // key of filename and breakpoint line
@@ -142,23 +157,41 @@ class KarateExecutionService(val project: Project) {
         if(System.getProperty("os.name").lowercase().contains("win")) {
             depUrls.add(createTempJarCopy(File(getJarPath())).toURI().toURL())
         } else {
-            depUrls.add(createTempJarCopy(File(getJarPath())).toURI().toURL());
+            depUrls.add(File(getJarPath()).toURI().toURL());
         }
         return URLClassLoader(depUrls.toTypedArray(), null)
     }
 
     private fun createTempJarCopy(originalJar: File): File {
-        val tempJar = File.createTempFile("unlocked-${System.currentTimeMillis()}", ".jar")
+        val tempJar = File.createTempFile("unlocked-${project.name}", ".jar")
         originalJar.inputStream().use { input ->
             tempJar.outputStream().use { output ->
                 input.copyTo(output)
             }
         }
         tempJar.deleteOnExit()
+        tempFilesToDelete.add(tempJar)
         return tempJar
     }
 
     fun isBreakpointPlaced(file: String, lineNumber: Int): Boolean {
         return BREAKPOINTS[file]?.contains(lineNumber) ?: false
+    }
+
+    private fun startTempCleaner() {
+        tempFileCleaner.scheduleAtFixedRate({
+            var filesDeleted = 0
+            while (filesDeleted <= 10) {
+                val file = tempFilesToDelete.poll() ?: break
+                try {
+                    if (file.exists() && file.delete()) {
+                        filesDeleted++
+                    } else {
+                        tempFilesToDelete.add(file)
+                    }
+                } catch (e: Exception) {
+                }
+            }
+        }, 0, 5, TimeUnit.MINUTES)
     }
 }
