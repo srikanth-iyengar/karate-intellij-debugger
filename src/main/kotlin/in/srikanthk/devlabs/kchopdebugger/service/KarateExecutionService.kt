@@ -166,11 +166,11 @@ class KarateExecutionService(val project: Project) {
 
         val pomFile = File(mavenProject.file.path)
         val parameters = MavenRunnerParameters(
-            true,
             pomFile.parent,
+            pomFile.name,
+            true,
             listOf("clean", "package", "-DskipTests=true"),
-            emptyList<String>(),
-            null
+            emptyMap()
         )
         mavenProject.dependencies
 

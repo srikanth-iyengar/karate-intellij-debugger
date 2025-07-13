@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "in.srikanthk.devlabs.kchopdebugger"
-version = "1.2.0-alpha"
+version = rootProject.version
 
 repositories {
     mavenCentral()
@@ -23,7 +23,7 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(11)
 }
 
 application {
