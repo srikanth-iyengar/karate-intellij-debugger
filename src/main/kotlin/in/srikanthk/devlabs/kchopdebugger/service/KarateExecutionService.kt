@@ -24,7 +24,6 @@ import org.jetbrains.idea.maven.execution.MavenRunnerParameters
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.io.File
 import java.nio.file.Paths
-import java.util.*
 import java.util.concurrent.ConcurrentSkipListSet
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.pathString
