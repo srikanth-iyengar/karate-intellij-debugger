@@ -73,11 +73,26 @@ class KarateExecutionService(val project: Project) {
                 override fun evaluateExpression(expression: String) {
                     remotePublisher.evaluateExpression(expression)
                 }
+
+                override fun addBreakpoint(fileName: String, lineNumber: Int) {
+                    remotePublisher.addBreakpoint(fileName, lineNumber)
+                }
+
+                override fun removeBreakpoint(fileName: String, lineNumber: Int) {
+                    remotePublisher.removeBreakpoint(fileName, lineNumber)
+                }
             })
 
             val debugServer = DebugServer.getInstance().start()
-            val command =
-                "${getProjectJavaExecutable(project)} -Ddebug.port=${debugServer.port} -jar ${getAgentJarFile().path} $featureClasspath ${project.basePath} $breakpointJson $urls "
+
+            val vmOptions = buildString {
+                runPropertiesService?.state?.entries?.forEach { entry ->
+                    append("-D${entry.key}=${entry.value} ")
+                }
+                append("-Ddebug.port=${debugServer.port}")
+            }.trim()
+
+            val command = "${getProjectJavaExecutable(project)} $vmOptions -jar ${getAgentJarFile().path} $featureClasspath ${project.basePath} $breakpointJson $urls"
             val process =
                 ProcessBuilder(*command.split(" ").toTypedArray())
                     .redirectError(ProcessBuilder.Redirect.INHERIT)
@@ -109,11 +124,15 @@ class KarateExecutionService(val project: Project) {
     fun addBreakpoint(file: String, lineNumber: Int) {
         BREAKPOINTS.computeIfAbsent(file) { ConcurrentSkipListSet() }.add(lineNumber)
         breakpointUpdatePublisher?.updatedBreakpoint()
+        val remotePublisher = DebugMessageBus.getInstance().publisher(DebugRequest.TOPIC)
+        remotePublisher.addBreakpoint(file, lineNumber)
     }
 
     fun removeBreakpoint(file: String, lineNumber: Int) {
         BREAKPOINTS[file]?.remove(lineNumber)
         breakpointUpdatePublisher?.updatedBreakpoint()
+        val remotePublisher = DebugMessageBus.getInstance().publisher(DebugRequest.TOPIC)
+        remotePublisher.removeBreakpoint(file, lineNumber)
     }
 
 
@@ -170,17 +189,6 @@ class KarateExecutionService(val project: Project) {
         val jarFile = File(File(project.basePath, "target"), testJarFileName)
 
         return jarFile.path.toString()
-    }
-
-    private fun createTempJarCopy(originalJar: File): File {
-        val tempJar = File.createTempFile("unlocked-${System.currentTimeMillis()}", ".jar")
-        originalJar.inputStream().use { input ->
-            tempJar.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-        tempJar.deleteOnExit()
-        return tempJar
     }
 
     fun isBreakpointPlaced(file: String, lineNumber: Int): Boolean {

@@ -11,4 +11,6 @@ interface DebuggerInfoRequestTopic {
     fun stepForward()
     fun resume()
     fun evaluateExpression(expression: String)
+    fun addBreakpoint(fileName: String, lineNumber: Int)
+    fun removeBreakpoint(fileName: String, lineNumber: Int)
 }

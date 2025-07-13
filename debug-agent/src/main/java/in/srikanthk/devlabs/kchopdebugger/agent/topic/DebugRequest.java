@@ -9,4 +9,6 @@ public interface DebugRequest {
     void stepOver();
     void resume();
     void evaluateExpression(String expression);
+    void addBreakpoint(String fileName, Integer lineNumber);
+    void removeBreakpoint(String fileName, Integer lineNumber);
 }

@@ -45,9 +45,8 @@ public class DebugMessageBus {
                 new Class[]{topic.getListenerClazz()},
                 (proxy, method, args) -> {
                     Set<Object> listeners = subscribers.getOrDefault(topic, Collections.emptySet());
-                    List<Future<?>> futures = new ArrayList<>();
                     for (Object listener : listeners) {
-                        var future = CompletableFuture.supplyAsync(() -> {
+                        CompletableFuture.supplyAsync(() -> {
                             try {
                                 return method.invoke(listener, args);
                             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -55,15 +54,7 @@ public class DebugMessageBus {
                             }
                             return null;
                         }, executor);
-                        futures.add(future);
                     }
-                    futures.forEach(f -> {
-                        try {
-                            f.get();
-                        } catch (InterruptedException | ExecutionException e) {
-                            logger.error(e.getMessage(), e);
-                        }
-                    });
                     return null;
                 }
         );

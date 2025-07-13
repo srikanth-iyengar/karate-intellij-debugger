@@ -91,6 +91,16 @@ public class DebugHook implements RuntimeHook {
                         sr.engine.setFailedReason(null);
                     }
                 }
+
+                @Override
+                public void addBreakpoint(String fileName, Integer lineNumber) {
+                    breakpoints.computeIfAbsent(fileName, k -> new TreeSet<>()).add(lineNumber);
+                }
+
+                @Override
+                public void removeBreakpoint(String fileName, Integer lineNumber) {
+                    breakpoints.computeIfAbsent(fileName, k -> new TreeSet<>()).remove(lineNumber);
+                }
             });
 
             try {

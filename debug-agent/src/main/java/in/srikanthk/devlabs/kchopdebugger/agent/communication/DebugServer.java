@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.Remote;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,6 +111,26 @@ public class DebugServer {
             @Override
             public void evaluateExpression(String expression) {
                 RemoteCall call = RemoteCall.builder().args(List.of(expression)).methodName("evaluateExpression").build();
+                try {
+                    stream.writeObject(call);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void addBreakpoint(String fileName, Integer lineNumber) {
+                RemoteCall call = RemoteCall.builder().args(List.of(fileName, lineNumber)).methodName("addBreakpoint").build();
+                try {
+                    stream.writeObject(call);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void removeBreakpoint(String fileName, Integer lineNumber) {
+                RemoteCall call = RemoteCall.builder().args(List.of(fileName, lineNumber)).methodName("removeBreakpoint").build();
                 try {
                     stream.writeObject(call);
                 } catch (IOException e) {
