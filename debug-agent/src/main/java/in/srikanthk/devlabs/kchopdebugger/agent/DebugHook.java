@@ -62,7 +62,7 @@ public class DebugHook implements RuntimeHook {
             stopOnNextStep.set(false);
             CountDownLatch latch = new CountDownLatch(1);
 
-            messageBus.subscribe(DebugRequest.TOPIC, new DebugRequest() {
+            var listener = new DebugRequest() {
                 @Override
                 public void publishKarateVariables() {
                     publishKarateVariablesSerializabel(sr.engine.vars);
@@ -101,7 +101,8 @@ public class DebugHook implements RuntimeHook {
                 public void removeBreakpoint(String fileName, Integer lineNumber) {
                     breakpoints.computeIfAbsent(fileName, k -> new TreeSet<>()).remove(lineNumber);
                 }
-            });
+            };
+            messageBus.subscribe(DebugRequest.TOPIC, listener);
 
             try {
                 latch.await();
@@ -109,6 +110,7 @@ public class DebugHook implements RuntimeHook {
                 throw new RuntimeException(e);
             }
             responsePublisher.updateState(DebuggerState.Running);
+            messageBus.unsubscribe(DebugRequest.TOPIC, listener);
         }
 
         return RuntimeHook.super.beforeStep(step, sr);
