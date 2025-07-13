@@ -6,9 +6,3 @@ interface Constants {
         const val MAVEN_BUILDER_COMMAND = "mvn clean package -DskipTests=true"
     }
 }
-
-enum class DebuggerState {
-    Halted,
-    Finished,
-    Started
-}

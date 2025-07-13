@@ -17,14 +17,12 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.components.panels.NonOpaquePanel
 import com.intellij.xdebugger.ui.DebuggerColors
-import com.intuit.karate.KarateException
-import com.intuit.karate.core.Variable
-import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
+import `in`.srikanthk.devlabs.kchopdebugger.agent.DebuggerState
 import `in`.srikanthk.devlabs.kchopdebugger.service.KarateExecutionService
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoRequestTopic
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
-import java.util.Optional
+import java.util.HashMap
 import javax.swing.JPanel
 
 class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) {
@@ -82,7 +80,7 @@ class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) 
 
         // -- Subscribe to debugger updates
         project.messageBus.connect().subscribe(DebuggerInfoResponseTopic.TOPIC, object : DebuggerInfoResponseTopic {
-            override fun updateKarateVariables(vars: Map<String, Variable>) {}
+            override fun updateKarateVariables(vars: HashMap<String, Map<String, Object>>) {}
             override fun updateState(state: DebuggerState) {
                 WriteCommandAction.runWriteCommandAction(project) {
                     updateDebuggerState(state)
@@ -95,7 +93,7 @@ class ChopDebuggerWindow(private val project: Project) : JPanel(BorderLayout()) 
                 }
             }
 
-            override fun evaluateExpressionResult(result: Optional<Variable>, error: Optional<KarateException>) {
+            override fun evaluateExpressionResult(result: String, error: String) {
             }
 
             override fun appendLog(log: String, isSuccess: Boolean) {}

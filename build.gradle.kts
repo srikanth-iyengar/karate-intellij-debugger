@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "in.srikanthk.devlabs"
-version = "1.1.0-alpha"
+version = "1.2.0-alpha"
 
 repositories {
     mavenCentral()
@@ -25,9 +25,7 @@ dependencies {
     }
 
     implementation("com.intuit.karate:karate-junit5:1.4.1")
-    implementation("net.bytebuddy:byte-buddy:1.14.12")
-    implementation("net.bytebuddy:byte-buddy-agent:1.14.12")
-
+    implementation(project(":debug-agent"))
 }
 
 intellijPlatform {
@@ -74,5 +72,14 @@ tasks {
             privateKey.set(keyContent)
             password.set(certPassword)
         }
+    }
+}
+
+tasks.named<ProcessResources>("processResources") {
+    dependsOn(":debug-agent:build")
+
+    from("debug-agent/build/libs/debug-agent-${project.version}.jar") {
+        into("lib")
+        rename { "agent.jar" }
     }
 }

@@ -1,13 +1,14 @@
 package `in`.srikanthk.devlabs.kchopdebugger.ui
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.table.JBTable
 import com.intuit.karate.KarateException
 import com.intuit.karate.core.Variable
-import `in`.srikanthk.devlabs.kchopdebugger.service.DebuggerState
+import `in`.srikanthk.devlabs.kchopdebugger.agent.DebuggerState
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoRequestTopic
 import `in`.srikanthk.devlabs.kchopdebugger.topic.DebuggerInfoResponseTopic
 import java.awt.BorderLayout
@@ -71,38 +72,39 @@ class DebugVariableTable(project: Project) : JPanel(BorderLayout()) {
         val messageBus = project.messageBus.connect()
 
         messageBus.subscribe(DebuggerInfoResponseTopic.TOPIC, object : DebuggerInfoResponseTopic {
-            override fun updateKarateVariables(vars: Map<String, Variable>) {
-                val shouldResize = tableModel.rowCount == 0
-                tableModel.setNumRows(0)
-                vars.entries.forEach {
-                    val value =
-                        if (it.value.type == Variable.Type.MAP) objectMapper.writeValueAsString(it.value.getValue()) else it.value.getValue<Object>()
-                            .toString()
-                    tableModel.addRow(arrayOf(it.key, it.value.type, value))
-                }
+            override fun updateKarateVariables(vars: HashMap<String, Map<String, Object>>) {
+                WriteCommandAction.runWriteCommandAction(project) {
+                    val shouldResize = tableModel.rowCount == 0
+                    tableModel.setNumRows(0)
+                    vars.entries.forEach {
+                        tableModel.addRow(arrayOf(it.key, it.value.get("type"), it.value.get("value")))
+                    }
 
-                if (shouldResize) {
-                    table.doLayout()
+                    if (shouldResize) {
+                        table.doLayout()
+                    }
                 }
             }
 
             override fun updateState(state: DebuggerState) {
-                if (state == DebuggerState.Finished) {
-                    tableModel.setNumRows(0)
+                WriteCommandAction.runWriteCommandAction(project) {
+                    if (state == DebuggerState.Finished) {
+                        tableModel.setNumRows(0)
+                    }
                 }
             }
 
-            override fun evaluateExpressionResult(result: Optional<Variable>, error: Optional<KarateException>) {
-                if (error.isPresent) {
-                    resultField.text = "[Error] ${error.get().message}"
+            override fun evaluateExpressionResult(result: String, error: String) {
+                if (error.isNotEmpty()) {
+                    resultField.text = "[Error] error"
                     resultField.toolTipText = null
                     resultField.cursor = Cursor.getDefaultCursor()
-                    return
+                    return;
                 }
 
-                if (result.isPresent) {
-                    val karateVar = result.get()
-                    val value = karateVar.getValue<Any>()
+                if (result.isNotEmpty()) {
+                    val karateVar = result
+                    val value = karateVar
 
                     if (value == null) {
                         resultField.text = "NULL"
@@ -111,17 +113,8 @@ class DebugVariableTable(project: Project) : JPanel(BorderLayout()) {
                         return
                     }
 
-                    val jsonString = try {
-                        if (karateVar.type == Variable.Type.MAP || karateVar.type == Variable.Type.LIST || karateVar.type == Variable.Type.XML) {
-                            objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value)
-                        } else {
-                            value.toString()
-                        }
-                    } catch (e: Exception) {
-                        value.toString()
-                    }
-                    jsonResultString = jsonString
-                    resultField.text = if (jsonString.length > 100) jsonString.take(100) + "..." else jsonString
+                    jsonResultString = value
+                    resultField.text = if (value.length > 100) value.take(100) + "..." else value
                     resultField.toolTipText = "Click to expand"
                     resultField.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
 
