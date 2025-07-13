@@ -1,12 +1,15 @@
 package in.srikanthk.devlabs.kchopdebugger.agent;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.karate.Runner;
 import in.srikanthk.devlabs.kchopdebugger.agent.communication.DebugClient;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +71,13 @@ public class Main {
                 .collect(Collectors.toList());
     }
 
-    private static void initializeSessionState(String featurePath, String basePath, String breakpointsJson) throws IOException {
+    private static void initializeSessionState(String featurePath, String basePath, String breakpointPath) throws IOException {
         sessionState.setFeatureClassPath(featurePath);
         sessionState.setProjectPath(basePath);
-        Map<String, Object> breakpoints = objectMapper.readValue(breakpointsJson, new TypeReference<>() {
+
+        String json = Files.readString(Path.of(breakpointPath), StandardCharsets.UTF_8);
+
+        Map<String, Object> breakpoints = objectMapper.readValue(json, new TypeReference<>() {
         });
         breakpoints.forEach((key, value) -> {
             if (key instanceof String) {
