@@ -23,7 +23,9 @@ import org.jetbrains.idea.maven.execution.MavenRunner
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 import java.util.concurrent.ConcurrentSkipListSet
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.pathString
@@ -49,7 +51,15 @@ class KarateExecutionService(val project: Project) {
             val featureClasspath = fileName.substring(projectBasePath.length + 1)
 
             val urls = getMavenDependenciesURL().joinToString(";");
-            val breakpointJson = mapper.writeValueAsString(BREAKPOINTS);
+            val breakpointJson = mapper.writeValueAsString(BREAKPOINTS)
+            val breakpointPath = Files.createTempFile("breakpoints_", ".json")
+            Files.writeString(
+                breakpointPath,
+                breakpointJson,
+                StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.WRITE
+            )
 
             val subscriber = createRemoteCallSubscriber();
             DebugMessageBus.getInstance().subscribe(DebugResponse.TOPIC, subscriber);
@@ -92,7 +102,8 @@ class KarateExecutionService(val project: Project) {
                 append("-Ddebug.port=${debugServer.port}")
             }.trim()
 
-            val command = "${getProjectJavaExecutable(project)} $vmOptions -jar ${getAgentJarFile().path} $featureClasspath ${project.basePath} $breakpointJson $urls"
+            val command =
+                "${getProjectJavaExecutable(project)} $vmOptions -jar ${getAgentJarFile().path} $featureClasspath ${project.basePath} $breakpointPath $urls"
             val process =
                 ProcessBuilder(*command.split(" ").toTypedArray())
                     .redirectError(ProcessBuilder.Redirect.INHERIT)
@@ -108,6 +119,7 @@ class KarateExecutionService(val project: Project) {
             // clear all the message bus subscribers
             DebugMessageBus.getInstance().clearAll()
             messageBus.disconnect()
+            Files.deleteIfExists(breakpointPath)
         }
     }
 
